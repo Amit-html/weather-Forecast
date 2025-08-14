@@ -3,79 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>weather forecast</title>
+    <title>Weather Forecast</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+            color: #222;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 400px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+            padding: 32px 24px 24px 24px;
+        }
+        h1 {
+            text-align: center;
+            color: #2471a3;
+            margin-bottom: 8px;
+        }
+        #weather {
+            margin: 24px 0;
+            text-align: center;
+        }
+        #weather img {
+            width: 64px;
+            height: 64px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 32px;
+        }
+        a {
+            color: #2471a3;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <h1>Weather Forecast</h1>
-    <p>Welcome to the weather forecast page. Here you can find the latest weather updates.</p>
-    <div id="weather"></div>
-    <p>Stay tuned for more information on weather conditions, forecasts, and alerts.</p>
-    <p>For more details, please check the weather API documentation.</p>
-    <p>For any inquiries, feel free to reach out to us.</p>
-    <p>Follow us on social media for the latest updates.</p>
-    <p>Thank you for visiting our weather forecast page.</p>
-    <p>We hope you find the information useful and informative.</p>
-    <p>Remember to check back regularly for the latest weather updates.</p>
-    <p>Stay safe and prepared for any weather conditions.</p>
-    <p>Have a great day!</p>
-    <p>For more information, visit our <a href="https://www.weatherapi.com/">Weather API</a>.</p>
-    <p>Check out our <a href="https://www.weather.com/">partner site</a> for additional weather resources.</p>
-    <p>We appreciate your feedback and suggestions.</p>
-    <footer>
-        <p>&copy; 2023 Weather Forecast</p>
-        <p>Contact us at <a href="mailto:info@weatherforecast.com">info@weatherforecast.com</a></p>
-    </footer>
+    <div class="container">
+        <h1>Weather Forecast</h1>
+        <div id="weather">Loading weather...</div>
+        <div style="text-align:center;">
+            <a href="https://www.weatherapi.com/" target="_blank">Weather API</a> &nbsp;|&nbsp;
+            <a href="https://www.weather.com/" target="_blank">Partner Site</a>
+        </div>
+    </div>
+    <div class="footer">
+        &copy; 2023 Weather Forecast &mdash; 
+        <a href="mailto:info@weatherforecast.com">Contact Us</a>
+    </div>
     <script>
-        // Example JavaScript code to fetch weather data and display it
+        // Fetch weather data and display it
         async function fetchWeather() {
-            const apiKey = 'Y96ceb246d240428f9fa152029251408'; 
-            const city = 'London';
+            const apiKey = '96ceb246d240428f9fa152029251408'; // Make sure this is valid!
+            const city = 'delhi,india'; // Change to your desired city
             const weatherDiv = document.getElementById('weather');
             try {
                 const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`);
-                if (!response.ok) throw new Error('Network response was not ok');
+                if (!response.ok) {
+                    // Try to get error message from API
+                    let errorMsg = 'Network response was not ok';
+                    try {
+                        const errData = await response.json();
+                        if (errData && errData.error && errData.error.message) {
+                            errorMsg = errData.error.message;
+                        }
+                    } catch {}
+                    throw new Error(errorMsg);
+                }
                 const data = await response.json();
                 weatherDiv.innerHTML = `
-                    <h2>Current Weather in ${data.location.name}</h2>
-                    <p><strong>Temperature:</strong> ${data.current.temp_c}°C</p>
-                    <p><strong>Condition:</strong> ${data.current.condition.text}</p>
+                    <h2 style="margin-bottom:8px;">${data.location.name}, ${data.location.country}</h2>
                     <img src="${data.current.condition.icon}" alt="${data.current.condition.text}">
+                    <div style="font-size:2em; margin:8px 0;">${data.current.temp_c}°C</div>
+                    <div style="color:#2471a3; font-weight:bold;">${data.current.condition.text}</div>
+                    <div style="margin-top:10px; font-size:0.95em;">
+                        <span>Humidity: ${data.current.humidity}%</span> &nbsp;|&nbsp;
+                        <span>Wind: ${data.current.wind_kph} kph</span>
+                    </div>
                 `;
             } catch (error) {
-                weatherDiv.innerHTML = '<p style="color:red;">Error fetching weather data.</p>';
+                weatherDiv.innerHTML = `<p style="color:red;">Error fetching weather data: ${error.message}</p>`;
                 console.error('Error fetching weather data:', error);
             }
         }
         fetchWeather();
     </script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-        }
-        h1 {
-            color: #2c3e50;
-        }
-        #weather {
-            background: #fff;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            max-width: 350px;
-        }
-        footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 0.8em;
-            color: #7f8c8d;
-        }
-        p {
-            line-height: 1.6;
-        }
-    </style>
 </body>
 </html>
